@@ -1,10 +1,23 @@
 import { Hono } from 'hono'
+import { cors } from 'hono/cors'
 import { handle } from 'hono/vercel'
 
 // Blog
 import * as prismic from '@prismicio/client'
 
 const app = new Hono().basePath('/api')
+
+app.use(
+  '/api/*',
+  cors({
+    origin: ['http://localhost'],
+    allowHeaders: ['Upgrade-Insecure-Requests'],
+    allowMethods: ['GET', 'OPTIONS'],
+    exposeHeaders: ['Content-Length'],
+    maxAge: 600,
+    credentials: true
+  })
+)
 
 app.get('/', async (c) => {
   const type = c.req.queries('type')?.shift()
