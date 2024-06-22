@@ -10,7 +10,7 @@ const app = new Hono().basePath('/api')
 app.use(
   '/',
   cors({
-    origin: ['http://localhost:5173', 'https://jonasebert.de', 'https://test.jonasebert.de', '*'],
+    origin: ['*'],
     allowHeaders: ['Upgrade-Insecure-Requests'],
     allowMethods: ['GET', 'OPTIONS'],
     exposeHeaders: ['Content-Length'],
