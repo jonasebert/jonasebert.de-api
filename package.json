@@ -1,13 +1,14 @@
 {
-  "type": "module", 
+  "type": "module",
   "scripts": {
     "start": "vercel dev",
     "deploy": "vercel"
   },
   "dependencies": {
+    "@prismicio/client": "^7.6.0",
     "hono": "^4.4.2"
   },
   "devDependencies": {
-    "vercel": "^32.4.1"
+    "vercel": "^32.3.0"
   }
 }
