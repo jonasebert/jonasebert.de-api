@@ -10,7 +10,7 @@ const app = new Hono().basePath('/api')
 app.use(
   '/',
   cors({
-    origin: ['http://localhost:5173', 'https://jonasebert.de', 'https://test.jonasebert.de', 'jonas-eberts-projects.vercel.app'],
+    origin: ['http://localhost:5173', 'https://jonasebert.de', 'https://test.jonasebert.de', '*'],
     allowHeaders: ['Upgrade-Insecure-Requests'],
     allowMethods: ['GET', 'OPTIONS'],
     exposeHeaders: ['Content-Length'],
