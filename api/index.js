@@ -22,6 +22,7 @@ app.use(
 app.get('/', async (c) => {
   const type = c.req.queries('type')?.shift()
   let posts
+  let resp
   switch (type) {
     case 'blog':
       const maxItems = c.req.queries('maxitems')?.shift() || '30'
@@ -37,12 +38,20 @@ app.get('/', async (c) => {
       try {
         switch (itemType) {
           case 'all':
-            posts = await prismicClient.getByType('article', { orderings: { field: 'document.first_publication_date', direction: 'desc' }, pageSize: maxItems})
+            resp = await prismicClient.getByType('article', { orderings: { field: 'document.first_publication_date', direction: 'desc' }, pageSize: maxItems})
+            posts = resp.results
             break;
 
           case 'category':
             const category = c.req.queries('category')?.shift()
-            posts = await prismicClient.getByTag(category, { orderings: { field: 'document.first_publication_date', direction: 'desc' }, pageSize: maxItems})
+            resp = await prismicClient.getByTag(category, { orderings: { field: 'document.first_publication_date', direction: 'desc' }, pageSize: maxItems})
+            posts = resp.results
+            break;
+
+          case 'post':
+            const postId = c.req.queries('postid')?.shift()
+            resp = await prismicClient.getByUID('article', postId,)
+            posts = resp
             break;
 
           default:
@@ -55,7 +64,7 @@ app.get('/', async (c) => {
           input: {
             maxItems, itemType
           },
-          data: posts.results
+          data: posts
         })
       } catch (error) {
         console.error(error)
