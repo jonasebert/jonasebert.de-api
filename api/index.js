@@ -8,9 +8,9 @@ import * as prismic from '@prismicio/client'
 const app = new Hono().basePath('/api')
 
 app.use(
-  '/api/*',
+  '/',
   cors({
-    origin: ['http://localhost'],
+    origin: ['http://localhost:5173', 'https://jonasebert.de'],
     allowHeaders: ['Upgrade-Insecure-Requests'],
     allowMethods: ['GET', 'OPTIONS'],
     exposeHeaders: ['Content-Length'],
