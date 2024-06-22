@@ -4,7 +4,21 @@ import { handle } from 'hono/vercel'
 const app = new Hono().basePath('/api')
 
 app.get('/', (c) => {
-  return c.json({ message: "Congrats! You've deployed Hono to Vercel" })
+  const type = c.req.queries('type')?.shift()
+
+  switch (type) {
+    case 'blog':
+      // return c.json({ message: "Congrats! BLOG" })
+      const maxItems = c.req.queries('maxitems')?.shift()
+      return c.json({ input: {
+        maxItems
+      }})
+      break;
+  
+    default:
+      return c.json({ message: "Congrats! You've deployed Hono to Vercel" })
+      break;
+  }
 })
 
 const handler = handle(app);
