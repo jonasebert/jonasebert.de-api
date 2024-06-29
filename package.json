@@ -6,9 +6,9 @@
   },
   "dependencies": {
     "@prismicio/client": "^7.6.0",
-    "hono": "^4.4.9"
+    "hono": "^4.4.2"
   },
   "devDependencies": {
-    "vercel": "^34.2.7"
+    "vercel": "^34.2.8"
   }
 }
