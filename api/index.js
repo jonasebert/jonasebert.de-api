@@ -20,6 +20,8 @@ app.use(
 )
 
 app.get('/', async (c) => {
+  c.header('Access-Control-Allow-Origin', '*');
+
   const type = c.req.queries('type')?.shift()
   let posts
   let resp
