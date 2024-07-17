@@ -1,6 +1,8 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { handle } from 'hono/vercel'
+import ical from 'ical';
+import axios from 'axios';
 
 // Blog
 import * as prismic from '@prismicio/client'
@@ -71,6 +73,27 @@ app.get('/', async (c) => {
       } catch (error) {
         console.error(error)
         return new Response(undefined, { status: 500, statusText: 'An error occured'});
+      }
+      break;
+
+    case 'calendar':
+      const icalUrl = 'https://cloud.jonasebert.de/remote.php/dav/public-calendars/bn8yfoyg8GEQ6TNN?export';
+      const now = new Date();
+      const later = new Date(now.getFullYear(), now.getMonth()+3, now.getDate()+1);
+
+      try {
+        resp = await axios.get(icalUrl);
+        const data = resp.data;
+        const events = ical.parseICS(data);
+
+        return c.json({
+          internal: {
+            icalUrl, now, later
+          },
+          data: events
+        });
+      } catch {
+        return c.json({ error: 'Failed to fetch or parse ICS file'}, 500);
       }
       break;
   
