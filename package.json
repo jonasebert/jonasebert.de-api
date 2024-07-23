@@ -11,6 +11,6 @@
     "ical": "^0.8.0"
   },
   "devDependencies": {
-    "vercel": "^35.1.0"
+    "vercel": "^32.3.0"
   }
 }
