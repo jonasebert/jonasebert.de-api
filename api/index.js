@@ -95,7 +95,7 @@ app.get('/', async (c) => {
       } catch {
         return c.json({
           error: 'Failed to fetch or parse ICS file',
-          debug: { resp }
+          debug: { data }
         }, 500);
       }
       break;
