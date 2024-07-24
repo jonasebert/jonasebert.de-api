@@ -6,9 +6,8 @@
   },
   "dependencies": {
     "@prismicio/client": "^7.6.0",
-    "axios": "^1.7.2",
     "hono": "^4.5.1",
-    "ical": "^0.8.0"
+    "node-ical": "^0.18.0"
   },
   "devDependencies": {
     "vercel": "^35.1.0"

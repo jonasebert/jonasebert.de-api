@@ -1,8 +1,8 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { handle } from 'hono/vercel'
-import ical from 'ical';
-import axios from 'axios';
+import pkg_ical from 'node-ical';
+const { parseICS } = pkg_ical;
 
 // Blog
 import * as prismic from '@prismicio/client'
@@ -81,10 +81,10 @@ app.get('/', async (c) => {
       const now = new Date();
       const later = new Date(now.getFullYear(), now.getMonth()+3, now.getDate()+1);
 
-      try {
-        resp = await axios.get(icalUrl);
-        const data = resp.data;
-        const events = ical.parseICS(data);
+      // try {
+        resp = await fetch(icalUrl);
+        const data = await resp.text();
+        const events = parseICS(data);
 
         return c.json({
           internal: {
@@ -92,12 +92,12 @@ app.get('/', async (c) => {
           },
           data: events
         });
-      } catch {
-        return c.json({
-          error: 'Failed to fetch or parse ICS file',
-          debug: { data }
-        }, 500);
-      }
+      // } catch {
+      //   return c.json({
+      //     error: 'Failed to fetch or parse ICS file',
+      //     debug: {}
+      //   }, 500);
+      // }
       break;
   
     default:
