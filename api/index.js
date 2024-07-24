@@ -81,7 +81,7 @@ app.get('/', async (c) => {
       const now = new Date();
       const later = new Date(now.getFullYear(), now.getMonth()+3, now.getDate()+1);
 
-      // try {
+      try {
         resp = await fetch(icalUrl, {
           headers: {
             'User-Agent': 'Jonas Ebert/1.0'
@@ -95,16 +95,13 @@ app.get('/', async (c) => {
             icalUrl, now, later
           },
           data: events,
-          debugging: {
-            resp, data
-          }
         });
-      // } catch {
-      //   return c.json({
-      //     error: 'Failed to fetch or parse ICS file',
-      //     debug: {}
-      //   }, 500);
-      // }
+      } catch {
+        return c.json({
+          error: 'Failed to fetch or parse ICS file',
+          debug: {}
+        }, 500);
+      }
       break;
   
     default:
