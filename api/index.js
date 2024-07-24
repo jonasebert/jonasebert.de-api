@@ -90,7 +90,10 @@ app.get('/', async (c) => {
           internal: {
             icalUrl, now, later
           },
-          data: events
+          data: events,
+          debugging: {
+            resp, data
+          }
         });
       // } catch {
       //   return c.json({
