@@ -106,7 +106,7 @@ app.get('/', async (c) => {
                       start: date,
                       end: new Date(date.getTime() + (event.end - event.start))
                   }));
-              } else if (event.start >= now && event.start <= later) {
+              } else if ((event.start >= now && event.start <= later) || (event.end >= now && event.end <= later)) {
                   occurrences.push(event);
               }
               events.push(...occurrences);
