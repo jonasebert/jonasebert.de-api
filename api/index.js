@@ -82,7 +82,11 @@ app.get('/', async (c) => {
       const later = new Date(now.getFullYear(), now.getMonth()+3, now.getDate()+1);
 
       // try {
-        resp = await fetch(icalUrl);
+        resp = await fetch(icalUrl, {
+          headers: {
+            'User-Agent': 'Jonas Ebert/1.0'
+          }
+        });
         const data = await resp.text();
         const events = parseICS(data);
 
