@@ -120,16 +120,25 @@ app.get('/', async (c) => {
           const teaserImageMatch = event.description?.match(/^teaserimage:\s*(\S+)/);
           const teaserImageId = teaserImageMatch ? teaserImageMatch[1] : null;
           const teaserImageUrl = teaserImageId ? `https://cloud.jonasebert.de/index.php/apps/files_sharing/publicpreview/${teaserImageId}?x=3440&y=1440&a=true` : null;
+          let happeningnow;
+
+          // Check if event is happening now
+          if (event.start <= now && event.end >= now) {
+            happeningnow = true;
+          } else {
+            happeningnow = false;
+          }
 
           // Return to client
           return {
               start: event.start ? event.start : null,
               end: event.end ? event.end : null,
+              now: happeningnow ? happeningnow : false,
               datetype: event.datetype ? event.datetype : null,
               summary: event.summary ? event.summary : null,
               location: event.location ? event.location : null,
               description: event.description ? event.description.replace(/^teaserimage:\s*\S+\n?/, '') : null,
-              state: event.status ? event.status : null,
+              state: event.status ? event.status : "TENTATIVE",
               teaserImage: teaserImageUrl,
           }
         });
