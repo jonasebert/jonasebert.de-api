@@ -138,7 +138,7 @@ app.get('/', async (c) => {
               summary: event.summary ? event.summary : null,
               location: event.location ? event.location : null,
               description: event.description ? event.description.replace(/^teaserimage:\s*\S+\n?/, '') : null,
-              state: event.status ? event.status : null,
+              state: event.status ? event.status : "TENTATIVE",
               teaserImage: teaserImageUrl,
           }
         });
