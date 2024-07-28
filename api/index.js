@@ -92,7 +92,7 @@ app.get('/', async (c) => {
       const calIcalUrl = 'https://cloud.jonasebert.de/remote.php/dav/public-calendars/bn8yfoyg8GEQ6TNN?export';
       const calNow = new Date();
       const calLater = new Date(calNow.getFullYear(), calNow.getMonth()+3, calNow.getDate()+1);
-      const calMaxItems = c.req.queries('maxItems')?.shift() || '93';
+      const calMaxItems = c.req.queries('maxitems')?.shift() || '93';
 
       let calResp = [];
 
