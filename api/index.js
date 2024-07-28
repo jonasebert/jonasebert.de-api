@@ -1,15 +1,16 @@
+// Basics
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { handle } from 'hono/vercel'
+
+// For Blog
+import * as prismic from '@prismicio/client'
 
 // For calendar
 import pkg_ical from 'node-ical';
 import pkg_rrule from 'rrule';
 const { parseICS } = pkg_ical;
 const { RRule, RRuleSet, rrulestr } = pkg_rrule;
-
-// Blog
-import * as prismic from '@prismicio/client'
 
 const app = new Hono().basePath('/api')
 
@@ -27,14 +28,15 @@ app.use(
 
 app.get('/', async (c) => {
   c.header('Access-Control-Allow-Origin', '*');
-
   const type = c.req.queries('type')?.shift()
-  let posts
-  let resp
+
   switch (type) {
     case 'blog':
-      const maxItems = c.req.queries('maxitems')?.shift() || '30'
-      const itemType = c.req.queries('itemtype')?.shift()
+      let blogPosts = [];
+      let blogResp = [];
+
+      const blogMaxItems = c.req.queries('maxitems')?.shift() || '30'
+      const blogItemType = c.req.queries('itemtype')?.shift()
 
       const prismicClient = prismic.createClient('jonasebert', {
         routes: [
@@ -44,110 +46,106 @@ app.get('/', async (c) => {
       })
 
       try {
-        switch (itemType) {
+        switch (blogItemType) {
           case 'all':
-            resp = await prismicClient.getByType('article', { orderings: { field: 'document.first_publication_date', direction: 'desc' }, pageSize: maxItems})
-            posts = resp.results
+            blogResp = await prismicClient.getByType('article', { orderings: { field: 'document.first_publication_date', direction: 'desc' }, pageSize: blogMaxItems});
+            blogPosts = blogResp.results;
             break;
 
           case 'category':
-            const category = c.req.queries('category')?.shift()
-            resp = await prismicClient.getByTag(category, { orderings: { field: 'document.first_publication_date', direction: 'desc' }, pageSize: maxItems})
-            posts = resp.results
+            const blogCategory = c.req.queries('category')?.shift();
+            blogResp = await prismicClient.getByTag(blogCategory, { orderings: { field: 'document.first_publication_date', direction: 'desc' }, pageSize: blogMaxItems});
+            blogPosts = blogResp.results;
             break;
 
           case 'post':
-            const postId = c.req.queries('postid')?.shift()
-            resp = await prismicClient.getByUID('article', postId,)
-            posts = resp
+            const blogPostId = c.req.queries('postid')?.shift();
+            blogResp = await prismicClient.getByUID('article', blogPostId,);
+            blogPosts = blogResp;
             break;
 
           default:
-            console.error('Invalid itemType')
+            console.error('Invalid itemType');
             return new Response(undefined, { status: 400, statusText: 'Invalid Item Type'});
-            posts = [];
           }
 
         return c.json({
-          input: {
-            maxItems, itemType
-          },
-          data: posts
-        })
+          data: blogPosts
+        });
       } catch (error) {
-        console.error(error)
+        console.error(error);
         return new Response(undefined, { status: 500, statusText: 'An error occured'});
       }
       break;
 
     case 'calendar':
-      const icalUrl = 'https://cloud.jonasebert.de/remote.php/dav/public-calendars/bn8yfoyg8GEQ6TNN?export';
-      const now = new Date();
-      const later = new Date(now.getFullYear(), now.getMonth()+3, now.getDate()+1);
+      const calIcalUrl = 'https://cloud.jonasebert.de/remote.php/dav/public-calendars/bn8yfoyg8GEQ6TNN?export';
+      const calNow = new Date();
+      const calLater = new Date(calNow.getFullYear(), calNow.getMonth()+3, calNow.getDate()+1);
       const calMaxItems = c.req.queries('maxItems')?.shift() || '93';
 
+      let calResp = [];
+
       try {
-        resp = await fetch(icalUrl, {
+        calResp = await fetch(calIcalUrl, {
           headers: {
             'User-Agent': 'Jonas Ebert/1.0'
           }
         });
-        const respText = await resp.text();
-        const data = parseICS(respText);
-        let events = [];
+        const calRespText = await calResp.text();
+        const calData = parseICS(calRespText);
+        let calEvents = [];
 
         // Handle (recurrend) events
-        for (const event of Object.values(data)) {
-          if (event.type === 'VEVENT') {
-              let occurrences = [];
-              if (event.rrule) {
-                  const rule = rrulestr(event.rrule.toString(), { dtstart: event.start });
-                  occurrences = rule.between(now, later, true).map(date => ({
-                      ...event,
-                      start: date,
-                      end: new Date(date.getTime() + (event.end - event.start))
+        for (const calEvent of Object.values(calData)) {
+          if (calEvent.type === 'VEVENT') {
+              let calOccurrences = [];
+              if (calEvent.rrule) {
+                  const calRule = rrulestr(calEvent.rrule.toString(), { dtstart: calEvent.start });
+                  calOccurrences = calRule.between(calNow, calLater, true).map(calDate => ({
+                      ...calEvent,
+                      start: calData,
+                      end: new Date(calData.getTime() + (calEvent.end - calEvent.start))
                   }));
-              } else if ((event.start >= now && event.start <= later) || (event.end >= now && event.end <= later)) {
-                  occurrences.push(event);
+              } else if ((calEvent.start >= calNow && calEvent.start <= calLater) || (calEvent.end >= calNow && calEvent.end <= calLater)) {
+                  calOccurrences.push(calEvent);
               }
-              events.push(...occurrences);
+              calEvents.push(...calOccurrences);
           }
         }
         // Sort events
-        events = events.sort((a, b) => new Date(a.start) - new Date(b.start));
+        calEvents = calEvents.sort((a, b) => new Date(a.start) - new Date(b.start));
         // Slice events
-        events = events.slice(0, calMaxItems);
+        calEvents = calEvents.slice(0, calMaxItems);
         // Customize events
-        events = events.map(event => {
+        calEvents = calEvents.map(calEvent => {
           // Extrahieren der Teaserbild-ID aus der Beschreibung
-          const teaserImageMatch = event.description?.match(/^teaserimage:\s*(\S+)/);
-          const teaserImageId = teaserImageMatch ? teaserImageMatch[1] : null;
-          const teaserImageUrl = teaserImageId ? `https://cloud.jonasebert.de/index.php/apps/files_sharing/publicpreview/${teaserImageId}?x=3440&y=1440&a=true` : null;
-          let happeningnow;
+          const calTeaserImageMatch = calEvent.description?.match(/^teaserimage:\s*(\S+)/);
+          const calTeaserImageId = calTeaserImageMatch ? calTeaserImageMatch[1] : null;
+          const calTeaserImageUrl = calTeaserImageId ? `https://cloud.jonasebert.de/index.php/apps/files_sharing/publicpreview/${calTeaserImageId}?x=3440&y=1440&a=true` : null;
+          let calHappeningNow = false;
 
           // Check if event is happening now
-          if (event.start <= now && event.end >= now) {
-            happeningnow = true;
-          } else {
-            happeningnow = false;
+          if (calEvent.start <= calNow && calEvent.end >= calNow) {
+            calHappeningNow = true;
           }
 
           // Return to client
           return {
-              start: event.start ? event.start : null,
-              end: event.end ? event.end : null,
-              now: happeningnow ? happeningnow : false,
-              datetype: event.datetype ? event.datetype : null,
-              summary: event.summary ? event.summary : null,
-              location: event.location ? event.location : null,
-              description: event.description ? event.description.replace(/^teaserimage:\s*\S+\n?/, '') : null,
-              state: event.status ? event.status : "TENTATIVE",
-              teaserImage: teaserImageUrl,
+            start: calEvent.start ? calEvent.start : null,
+            end: calEvent.end ? calEvent.end : null,
+            now: calHappeningNow ? calHappeningNow : false,
+            datetype: calEvent.datetype ? calEvent.datetype : null,
+            summary: calEvent.summary ? calEvent.summary : null,
+            location: calEvent.location ? calEvent.location : null,
+            description: calEvent.description ? calEvent.description.replace(/^teaserimage:\s*\S+\n?/, '') : null,
+            state: calEvent.status ? calEvent.status : "TENTATIVE",
+            teaserImage: calTeaserImageUrl,
           }
         });
 
         return c.json({
-          data: events,
+          data: calEvents
         });
       } catch {
         return c.json({
