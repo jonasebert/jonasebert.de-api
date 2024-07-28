@@ -156,8 +156,13 @@ app.get('/', async (c) => {
       break;
   
     default:
-      console.error('Invalid Type')
-      return new Response(undefined, { status: 400, statusText: 'Ungültiger Typ-Parameter'});
+      console.error(`Invalid Type: ${c.req.queries('type')?.shift() || null}`)
+      return c.json({
+        error: 'Invalid or missing Type parameter',
+        debug: {
+          type: c.req.queries('type')?.shift() || null
+        }
+      }, 500);
   }
 })
 
