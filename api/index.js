@@ -84,6 +84,7 @@ app.get('/', async (c) => {
       const icalUrl = 'https://cloud.jonasebert.de/remote.php/dav/public-calendars/bn8yfoyg8GEQ6TNN?export';
       const now = new Date();
       const later = new Date(now.getFullYear(), now.getMonth()+3, now.getDate()+1);
+      const calMaxItems = c.req.queries('maxItems')?.shift() || '93';
 
       try {
         resp = await fetch(icalUrl, {
@@ -113,9 +114,11 @@ app.get('/', async (c) => {
           }
         }
         // Sort events
-        events.sort((a, b) => new Date(a.start) - new Date(b.start));
+        events = events.sort((a, b) => new Date(a.start) - new Date(b.start));
+        // Slice events
+        events = events.slice(0, calMaxItems);
         // Customize events
-        events = events.slice(0, 15).map(event => {
+        events = events.map(event => {
           // Extrahieren der Teaserbild-ID aus der Beschreibung
           const teaserImageMatch = event.description?.match(/^teaserimage:\s*(\S+)/);
           const teaserImageId = teaserImageMatch ? teaserImageMatch[1] : null;
@@ -144,9 +147,6 @@ app.get('/', async (c) => {
         });
 
         return c.json({
-          internal: {
-            icalUrl, now, later
-          },
           data: events,
         });
       } catch {
