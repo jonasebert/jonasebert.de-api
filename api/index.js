@@ -65,8 +65,13 @@ app.get('/', async (c) => {
             break;
 
           default:
-            console.error('Invalid itemType');
-            return new Response(undefined, { status: 400, statusText: 'Invalid Item Type'});
+            console.error(`Invalid ItemType: ${c.req.queries('itemtype')?.shift() || null}`);
+            return c.json({
+              error: 'Invalid or missing ItemType parameter',
+              debug: {
+                type: c.req.queries('itemtype')?.shift() || null
+              }
+            }, 500);
           }
 
         return c.json({
@@ -74,7 +79,12 @@ app.get('/', async (c) => {
         });
       } catch (error) {
         console.error(error);
-        return new Response(undefined, { status: 500, statusText: 'An error occured'});
+        return c.json({
+          error: 'An error occured',
+          debug: {
+            error: null
+          }
+        }, 500);
       }
       break;
 
@@ -156,7 +166,7 @@ app.get('/', async (c) => {
       break;
   
     default:
-      console.error(`Invalid Type: ${c.req.queries('type')?.shift() || null}`)
+      console.error(`Invalid Type: ${c.req.queries('type')?.shift() || null}`);
       return c.json({
         error: 'Invalid or missing Type parameter',
         debug: {
