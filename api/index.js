@@ -130,12 +130,16 @@ app.get('/', async (c) => {
         // Customize events
         calEvents = calEvents.map(calEvent => {
           // Extrahieren der Teaserbild-ID aus der Beschreibung
-          const calTeaserImageMatch = calEvent.description?.match(/^teaserimage:\s*(\S+)/);
+          const calTeaserImageMatch = calEvent.description?.match(/teaserimage:\s*(\S+)/);
           const calTeaserImageId = calTeaserImageMatch ? calTeaserImageMatch[1] : null;
           const calTeaserImageUrl = calTeaserImageId ? `https://cloud.jonasebert.de/index.php/apps/files_sharing/publicpreview/${calTeaserImageId}?x=3440&y=1440&a=true` : null;
-          let calHappeningNow = false;
+
+          // Extrahieren der externen Event URL
+          const calEventUrlMatch = calEvent.description?.match(/eventurl:\s*(\S+)/);
+          const calEventUrl = calEventUrlMatch ? calEventUrlMatch[1] : null;
 
           // Check if event is happening now
+          let calHappeningNow = false;
           if (calEvent.start <= calNow && calEvent.end >= calNow) {
             calHappeningNow = true;
           }
@@ -148,9 +152,10 @@ app.get('/', async (c) => {
             datetype: calEvent.datetype ? calEvent.datetype : null,
             summary: calEvent.summary ? calEvent.summary : null,
             location: calEvent.location ? calEvent.location : null,
-            description: calEvent.description ? calEvent.description.replace(/^teaserimage:\s*\S+\n?/, '') : null,
+            description: calEvent.description ? calEvent.description.replace(/teaserimage:\s*\S+\n?/, '').replace(/eventurl:\s*\S+\n?/, '') : null,
             state: calEvent.status ? calEvent.status : "TENTATIVE",
-            teaserImage: calTeaserImageUrl,
+            teaserImage: calTeaserImageUrl ? calTeaserImageUrl : null,
+            eventUrl: calEventUrl ? calEventUrl : null
           }
         });
 
