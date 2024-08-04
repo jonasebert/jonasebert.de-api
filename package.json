@@ -11,6 +11,6 @@
     "rrule": "^2.8.1"
   },
   "devDependencies": {
-    "vercel": "^35.1.0"
+    "vercel": "^35.2.3"
   }
 }
