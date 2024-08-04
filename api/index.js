@@ -155,7 +155,7 @@ app.get('/', async (c) => {
             description: calEvent.description ? calEvent.description.replace(/teaserimage:\s*\S+\n?/, '').replace(/eventurl:\s*\S+\n?/, '') : null,
             state: calEvent.status ? calEvent.status : "TENTATIVE",
             teaserImage: calTeaserImageUrl ? calTeaserImageUrl : null,
-            eventUrl: calEventUrl ? calEventUrl : null
+            url: calEventUrl ? calEventUrl : null
           }
         });
 
