@@ -12,6 +12,6 @@
   },
   "devDependencies": {
     "debug": "^4.3.6",
-    "vercel": "^35.2.3"
+    "vercel": "^35.2.4"
   }
 }
