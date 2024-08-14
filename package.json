@@ -6,12 +6,11 @@
   },
   "dependencies": {
     "@prismicio/client": "^7.8.0",
-    "hono": "^4.5.3",
+    "hono": "^4.5.5",
     "node-ical": "^0.18.0",
     "rrule": "^2.8.1"
   },
   "devDependencies": {
-    "debug": "^4.3.6",
-    "vercel": "^35.2.3"
+    "vercel": "^35.2.4"
   }
 }
