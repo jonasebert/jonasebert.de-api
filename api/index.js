@@ -136,9 +136,10 @@ app.get('/', async (c) => {
             case 'single':
               const calSingleItemUID = c.req.queries('id')?.shift();
 
-              if (calSingleItemUID && calSingleItemUID != '') {
-                calEvents = calEvents.filter(uid == calSingleItemUID);
+              if (calSingleItemUID) {
+                calEvents = calEvents.filter(event => event.uid === calSingleItemUID);
               } else {
+                console.error('[CALENDAR] Missing ID for single event:', calSingleItemUID ? calSingleItemUID : null);
                 return c.json({
                   error: 'Missing id for single event',
                   debug: {data: calEvents}
@@ -147,8 +148,14 @@ app.get('/', async (c) => {
               break;
 
             default:
+              console.error('[CALENDAR] Invalid itemtype:', calItemType ? calItemType : null);
+              return c.json({
+                error: 'Invalid item type',
+                debug: { ItemType: calItemType ? calItemType : null }
+              }, 400);        
           }
-        } catch {
+        } catch (error) {
+          console.error('Error fetching or parsing ICS file:', error);
           return c.json({
             error: 'Failed to fetch or parse ICS file',
             debug: {data: calEvents}
@@ -193,7 +200,8 @@ app.get('/', async (c) => {
         return c.json({
           data: calEvents
         });
-      } catch {
+      } catch (error) {
+        console.error('Error fetching or parsing ICS file:', error);
         return c.json({
           error: 'Failed to fetch or parse ICS file',
           debug: {}
