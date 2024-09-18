@@ -104,6 +104,7 @@ app.get('/', async (c) => {
         });
         const calRespText = await calResp.text();
         const calData = parseICS(calRespText);
+        console.log(calData);
         let calEvents = [];
 
         // Handle (recurrend) events
