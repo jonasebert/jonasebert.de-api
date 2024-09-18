@@ -127,7 +127,6 @@ app.get('/', async (c) => {
         calEvents = calEvents.sort((a, b) => new Date(a.start) - new Date(b.start));
         // Slice events
         calEvents = calEvents.slice(0, calMaxItems);
-        console.log(calEvents);
         // Customize events
         calEvents = calEvents.map(calEvent => {
           // Extrahieren der Teaserbild-ID aus der Beschreibung
@@ -147,6 +146,7 @@ app.get('/', async (c) => {
 
           // Return to client
           return {
+            id: calEvent.uid ? calEvent.uid : null,
             start: calEvent.start ? calEvent.start : null,
             end: calEvent.end ? calEvent.end : null,
             now: calHappeningNow ? calHappeningNow : false,
