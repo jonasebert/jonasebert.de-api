@@ -125,6 +125,50 @@ app.get('/', async (c) => {
         }
         // Sort events
         calEvents = calEvents.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+        // Calendar cases
+        try {
+          const calItemType = c.req.queries('itemtype')?.shift() || 'all';
+
+          switch (calItemType) {
+            case 'all': break;
+
+            case 'single':
+              const calSingleItemUID = c.req.queries('id')?.shift();
+
+              if (calSingleItemUID) {
+                calEvents = calEvents.filter(event => event.uid === calSingleItemUID);
+              } else {
+                console.error('[CALENDAR] Missing ID for single event:', calSingleItemUID ? calSingleItemUID : null);
+                return c.json({
+                  error: 'Missing id for single event',
+                  debug: { data: calEvents }
+                }, 500);
+              }
+              if (calEvents == '') {
+                console.error('[CALENDAR] Wrong ID for single event:', calSingleItemUID ? calSingleItemUID : null);
+                return c.json({
+                  error: 'Wrong id for single event',
+                  debug: { uid: calSingleItemUID ? calSingleItemUID : null }
+                }, 404);
+              }
+              break;
+
+            default:
+              console.error('[CALENDAR] Invalid itemtype:', calItemType ? calItemType : null);
+              return c.json({
+                error: 'Invalid item type',
+                debug: { ItemType: calItemType ? calItemType : null }
+              }, 400);        
+          }
+        } catch (error) {
+          console.error('[CALENDAR] Error fetching or parsing ICS file:', error);
+          return c.json({
+            error: 'Failed to fetch or parse ICS file',
+            debug: {data: calEvents}
+          }, 500);
+        }
+
         // Slice events
         calEvents = calEvents.slice(0, calMaxItems);
         // Customize events
@@ -146,6 +190,7 @@ app.get('/', async (c) => {
 
           // Return to client
           return {
+            id: calEvent.uid ? calEvent.uid : null,
             start: calEvent.start ? calEvent.start : null,
             end: calEvent.end ? calEvent.end : null,
             now: calHappeningNow ? calHappeningNow : false,
@@ -162,7 +207,8 @@ app.get('/', async (c) => {
         return c.json({
           data: calEvents
         });
-      } catch {
+      } catch (error) {
+        console.error('Error fetching or parsing ICS file:', error);
         return c.json({
           error: 'Failed to fetch or parse ICS file',
           debug: {}
