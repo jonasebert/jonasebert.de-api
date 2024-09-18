@@ -155,7 +155,7 @@ app.get('/', async (c) => {
               }, 400);        
           }
         } catch (error) {
-          console.error('Error fetching or parsing ICS file:', error);
+          console.error('[CALENDAR] Error fetching or parsing ICS file:', error);
           return c.json({
             error: 'Failed to fetch or parse ICS file',
             debug: {data: calEvents}
