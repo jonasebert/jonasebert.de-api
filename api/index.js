@@ -142,14 +142,14 @@ app.get('/', async (c) => {
                 console.error('[CALENDAR] Missing ID for single event:', calSingleItemUID ? calSingleItemUID : null);
                 return c.json({
                   error: 'Missing id for single event',
-                  debug: {data: calEvents}
+                  debug: { data: calEvents }
                 }, 500);
               }
               if (calEvents == '') {
                 console.error('[CALENDAR] Wrong ID for single event:', calSingleItemUID ? calSingleItemUID : null);
                 return c.json({
                   error: 'Wrong id for single event',
-                  debug: {data: calEvents}
+                  debug: { uid: calSingleItemUID ? calSingleItemUID : null }
                 }, 404);
               }
               break;
