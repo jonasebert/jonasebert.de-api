@@ -136,7 +136,7 @@ app.get('/', async (c) => {
             case 'single':
               const calSingleItemUID = c.req.queries('id')?.shift();
 
-              if (calSingleItemUID || calSingleItemUID != '') {
+              if (calSingleItemUID && calSingleItemUID != '') {
                 calEvents = calEvents.filter(uid == calSingleItemUID);
               } else {
                 return c.json({
