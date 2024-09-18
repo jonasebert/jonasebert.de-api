@@ -125,6 +125,36 @@ app.get('/', async (c) => {
         }
         // Sort events
         calEvents = calEvents.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+        // Calendar cases
+        try {
+          const calItemType = c.req.queries('itemtype')?.shift() || 'all';
+
+          switch (calItemType) {
+            case 'all': break;
+
+            case 'single':
+              const calSingleItemUID = c.req.queries('id')?.shift();
+
+              if (calSingleItemUID || calSingleItemUID != '') {
+                calEvents = calEvents.filter(uid == calSingleItemUID);
+              } else {
+                return c.json({
+                  error: 'Missing id for single event',
+                  debug: {data: calEvents}
+                }, 500);
+              }
+              break;
+
+            default:
+          }
+        } catch {
+          return c.json({
+            error: 'Failed to fetch or parse ICS file',
+            debug: {data: calEvents}
+          }, 500);
+        }
+
         // Slice events
         calEvents = calEvents.slice(0, calMaxItems);
         // Customize events
