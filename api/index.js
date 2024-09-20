@@ -173,10 +173,16 @@ app.get('/', async (c) => {
         calEvents = calEvents.slice(0, calMaxItems);
         // Customize events
         calEvents = calEvents.map(calEvent => {
-          // Extrahieren der Teaserbild-ID aus der Beschreibung
+          // Extract Teaserimage ID
           const calTeaserImageMatch = calEvent.description?.match(/teaserimage:\s*(\S+)/);
           const calTeaserImageId = calTeaserImageMatch ? calTeaserImageMatch[1] : null;
           const calTeaserImageUrl = calTeaserImageId ? `https://cloud.jonasebert.de/index.php/apps/files_sharing/publicpreview/${calTeaserImageId}?x=3440&y=1440&a=true` : null;
+          // Extract Teaserimage copyright text
+          const calTeaserImageCopyrightTextMatch = calEvent.description?.match(/teasercopyright:\s*(\S+)/);
+          const calTeaserImageCopyrightText = calTeaserImageCopyrightTextMatch ? calTeaserImageCopyrightTextMatch[1] : null;
+          // Extract Teaserimage copyright URI
+          const calTeaserImageCopyrighUrlMatch = calEvent.description?.match(/teaserurl:\s*(\S+)/);
+          const calTeaserImageCopyrighUrl = calTeaserImageCopyrighUrlMatch ? calTeaserImageCopyrighUrlMatch[1] : null;
 
           // Extrahieren der externen Event URL
           const calEventUrlMatch = calEvent.description?.match(/eventurl:\s*(\S+)/);
@@ -197,9 +203,15 @@ app.get('/', async (c) => {
             datetype: calEvent.datetype ? calEvent.datetype : null,
             summary: calEvent.summary ? calEvent.summary : null,
             location: calEvent.location ? calEvent.location : null,
-            description: calEvent.description ? calEvent.description.replace(/teaserimage:\s*\S+\n?/, '').replace(/eventurl:\s*\S+\n?/, '') : null,
+            description: calEvent.description ? calEvent.description.replace(/teaserimage:\s*\S+\n?/, '').replace(/eventurl:\s*\S+\n?/, '').replace(/teasercopyright:\s*(\S+)/, '').replace(/teaserurl:\s*(\S+)/, '') : null,
             state: calEvent.status ? calEvent.status : "TENTATIVE",
-            teaserImage: calTeaserImageUrl ? calTeaserImageUrl : null,
+            teaserImage: {
+              uri: calTeaserImageUrl ? calTeaserImageUrl : null,
+              copyright: {
+                text: calTeaserImageCopyrightText ?  calTeaserImageCopyrightText : null,
+                url: calTeaserImageCopyrighUrl ? calTeaserImageCopyrighUrl : null
+              }
+            },
             url: calEventUrl ? calEventUrl : null
           }
         });
