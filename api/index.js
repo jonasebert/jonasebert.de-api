@@ -206,7 +206,7 @@ app.get('/', async (c) => {
             description: calEvent.description ? calEvent.description.replace(/teaserimage:\s*\S+\n?/, '').replace(/eventurl:\s*\S+\n?/, '').replace(/teasercopyright:\s*(\S+)/, '').replace(/teaserurl:\s*(\S+)/, '') : null,
             state: calEvent.status ? calEvent.status : "TENTATIVE",
             teaserImage: {
-              uri: calTeaserImageUrl ? calTeaserImageUrl : null,
+              url: calTeaserImageUrl ? calTeaserImageUrl : null,
               copyright: {
                 text: calTeaserImageCopyrightText ?  calTeaserImageCopyrightText : null,
                 url: calTeaserImageCopyrighUrl ? calTeaserImageCopyrighUrl : null
