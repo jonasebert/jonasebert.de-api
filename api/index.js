@@ -174,18 +174,18 @@ app.get('/', async (c) => {
         // Customize events
         calEvents = calEvents.map(calEvent => {
           // Extract Teaserimage ID
-          const calTeaserImageMatch = calEvent.description?.match(/teaserimage:\s*(\S+)/);
+          const calTeaserImageMatch = calEvent.description?.match(/teaserimage:\s*(.+)/);
           const calTeaserImageId = calTeaserImageMatch ? calTeaserImageMatch[1] : null;
           const calTeaserImageUrl = calTeaserImageId ? `https://cloud.jonasebert.de/index.php/apps/files_sharing/publicpreview/${calTeaserImageId}?x=3440&y=1440&a=true` : null;
           // Extract Teaserimage copyright text
-          const calTeaserImageCopyrightTextMatch = calEvent.description?.match(/teasercopyright:\s*(\S+)/);
+          const calTeaserImageCopyrightTextMatch = calEvent.description?.match(/teasercopyright:\s*(.+)/);
           const calTeaserImageCopyrightText = calTeaserImageCopyrightTextMatch ? calTeaserImageCopyrightTextMatch[1] : null;
           // Extract Teaserimage copyright URI
-          const calTeaserImageCopyrighUrlMatch = calEvent.description?.match(/teaserurl:\s*(\S+)/);
+          const calTeaserImageCopyrighUrlMatch = calEvent.description?.match(/teaserurl:\s*(.+)/);
           const calTeaserImageCopyrighUrl = calTeaserImageCopyrighUrlMatch ? calTeaserImageCopyrighUrlMatch[1] : null;
 
           // Extrahieren der externen Event URL
-          const calEventUrlMatch = calEvent.description?.match(/eventurl:\s*(\S+)/);
+          const calEventUrlMatch = calEvent.description?.match(/eventurl:\s*(.+)/);
           const calEventUrl = calEventUrlMatch ? calEventUrlMatch[1] : null;
 
           // Check if event is happening now
@@ -193,6 +193,15 @@ app.get('/', async (c) => {
           if (calEvent.start <= calNow && calEvent.end >= calNow) {
             calHappeningNow = true;
           }
+
+          // Get Description
+          const calEventDescription = calEvent.description ? calEvent.description
+            .replace(/teaserimage:\s*\S+\n?/, '')
+            .replace(/eventurl:\s*\S+\n?/, '')
+            .replace(/teasercopyright:\s*.+\n?/, '')
+            .replace(/teaserurl:\s*\S+\n?/, '')
+            .replace(/\n/g, '<br>')
+            : null;
 
           // Return to client
           return {
@@ -203,7 +212,7 @@ app.get('/', async (c) => {
             datetype: calEvent.datetype ? calEvent.datetype : null,
             summary: calEvent.summary ? calEvent.summary : null,
             location: calEvent.location ? calEvent.location : null,
-            description: calEvent.description ? calEvent.description.replace(/teaserimage:\s*\S+\n?/, '').replace(/eventurl:\s*\S+\n?/, '').replace(/teasercopyright:\s*(\S+)/, '').replace(/teaserurl:\s*(\S+)/, '') : null,
+            description: calEventDescription,
             state: calEvent.status ? calEvent.status : "TENTATIVE",
             teaserImage: {
               url: calTeaserImageUrl ? calTeaserImageUrl : null,
