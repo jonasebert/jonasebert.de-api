@@ -244,9 +244,9 @@ app.get('/', async (c) => {
           });
           return c.body(cal.toString());
         } else {
-        return c.json({
-          data: calEvents
-        });
+          return c.json({
+            data: calEvents
+          });
         }
       } catch (error) {
         console.error('Error fetching or parsing ICS file:', error);
