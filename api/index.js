@@ -10,7 +10,7 @@ import * as prismic from '@prismicio/client'
 import pkg_ical from 'node-ical';
 import pkg_rrule from 'rrule';
 const { parseICS } = pkg_ical;
-const { RRule, RRuleSet, rrulestr } = pkg_rrule;
+const { rrulestr } = pkg_rrule;
 
 const app = new Hono().basePath('/api')
 
