@@ -8,9 +8,10 @@ import * as prismic from '@prismicio/client'
 
 // For calendar
 import pkg_ical from 'node-ical';
+import ical from 'ical-generator';
 import pkg_rrule from 'rrule';
 const { parseICS } = pkg_ical;
-const { RRule, RRuleSet, rrulestr } = pkg_rrule;
+const { rrulestr } = pkg_rrule;
 
 const app = new Hono().basePath('/api')
 
@@ -171,6 +172,7 @@ app.get('/', async (c) => {
 
         // Slice events
         calEvents = calEvents.slice(0, calMaxItems);
+
         // Customize events
         calEvents = calEvents.map(calEvent => {
           // Extract Teaserimage ID
@@ -203,7 +205,6 @@ app.get('/', async (c) => {
             .replace(/\n/g, '<br>')
             : null;
 
-          // Return to client
           return {
             id: calEvent.uid ? calEvent.uid : null,
             start: calEvent.start ? calEvent.start : null,
@@ -225,9 +226,28 @@ app.get('/', async (c) => {
           }
         });
 
-        return c.json({
-          data: calEvents
-        });
+        const download = c.req.queries('download')?.shift() === 'true';
+        if (download) {
+          const cal = ical();
+          calEvents.forEach(event => {
+            c.header('Content-Type', 'text/calendar');
+            c.header('Content-Disposition', `attachment; filename="${event.id}.ics"`);
+
+            cal.createEvent({
+              start: event.start,
+              end: event.end,
+              summary: event.summary,
+              description: event.description,
+              location: event.location,
+              uid: event.id
+            });
+          });
+          return c.body(cal.toString());
+        } else {
+          return c.json({
+            data: calEvents
+          });
+        }
       } catch (error) {
         console.error('Error fetching or parsing ICS file:', error);
         return c.json({
