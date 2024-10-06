@@ -232,7 +232,7 @@ app.get('/', async (c) => {
           calEvents.forEach(event => {
             c.header('Content-Type', 'text/calendar');
             c.header('Content-Disposition', `attachment; filename="${event.id}.ics"`);
-            console.log(event.location);
+
             cal.createEvent({
               start: event.start,
               end: event.end,
