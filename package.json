@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@prismicio/client": "^7.11.0",
-    "hono": "^4.6.3",
+    "hono": "^4.6.4",
     "ical-generator": "^8.0.0",
     "node-ical": "^0.19.0",
     "rrule": "^2.8.1"
