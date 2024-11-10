@@ -8,7 +8,7 @@
     "@prismicio/client": "^7.11.0",
     "hono": "^4.6.5",
     "ical-generator": "^8.0.1",
-    "node-ical": "^0.19.0",
+    "node-ical": "^0.20.1",
     "rrule": "^2.8.1"
   },
   "devDependencies": {
