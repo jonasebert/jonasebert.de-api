@@ -69,6 +69,7 @@ app.get('/', async (c) => {
             console.error(`Invalid ItemType: ${c.req.queries('itemtype')?.shift() || null}`);
             return c.json({
               error: 'Invalid or missing ItemType parameter',
+              valid: ['all', 'category', 'post'],
               debug: {
                 type: c.req.queries('itemtype')?.shift() || null
               }
@@ -129,7 +130,7 @@ app.get('/', async (c) => {
 
         // Calendar cases
         try {
-          const calItemType = c.req.queries('itemtype')?.shift() || 'all';
+          const calItemType = c.req.queries('itemtype')?.shift();
 
           switch (calItemType) {
             case 'all': break;
@@ -159,6 +160,7 @@ app.get('/', async (c) => {
               console.error('[CALENDAR] Invalid itemtype:', calItemType ? calItemType : null);
               return c.json({
                 error: 'Invalid item type',
+                valid: ['all', 'single'],
                 debug: { ItemType: calItemType ? calItemType : null }
               }, 400);        
           }
@@ -261,6 +263,7 @@ app.get('/', async (c) => {
       console.error(`Invalid Type: ${c.req.queries('type')?.shift() || null}`);
       return c.json({
         error: 'Invalid or missing Type parameter',
+        valid: ['blog', 'calendar'],
         debug: {
           type: c.req.queries('type')?.shift() || null
         }
